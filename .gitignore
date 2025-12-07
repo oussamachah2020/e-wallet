@@ -1,2 +1,21 @@
-node_modules
 .env
+.env.local
+.env.*.local
+
+# Docker volumes
+docker/postgres/data
+
+# Node
+node_modules/
+dist/
+.pnp.*
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

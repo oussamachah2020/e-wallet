@@ -8,10 +8,13 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 export class WalletsController {
   constructor(private walletsService: WalletsService) {}
 
-  @Post()
+  @Post('/create')
   @UseGuards(JwtAuthGuard)
-  async createWallet(@Body() createWalletDto: CreateWalletDto) {
-    return this.walletsService.createWallet(createWalletDto);
+  async createWallet(
+    @Body() createWalletDto: CreateWalletDto,
+    @CurrentUser('id') id: string,
+  ) {
+    return this.walletsService.createWallet({ ...createWalletDto }, id);
   }
 
   @Get('user')

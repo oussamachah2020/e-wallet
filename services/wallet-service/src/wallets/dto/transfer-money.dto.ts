@@ -8,7 +8,7 @@ import {
 
 export class TransferMoneyDto {
   @IsUUID()
-  toUserId: string; // Recipient's user ID
+  toUserId: string;
 
   @IsNumber()
   @IsPositive()

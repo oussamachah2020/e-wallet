@@ -10,7 +10,7 @@ import { Repository } from 'typeorm';
 import { RefreshToken } from './entities/refresh-token.entity';
 import { JwtService } from '@nestjs/jwt';
 import * as crypto from 'crypto';
-import { hashSync } from 'bcrypt';
+import { hashSync, compare } from 'bcrypt';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { Response } from 'express';
@@ -68,12 +68,21 @@ export class AuthService {
       throw new BadRequestException('Invalid credentials');
     }
 
+    const isPasswordMatching = await compare(
+      credentials.password,
+      foundUser.password,
+    );
+
+    if (!isPasswordMatching) {
+      throw new BadRequestException('Invalid credentials');
+    }
+
     const accessToken = await this.generateAccessToken(foundUser);
     const refreshToken = await this.generateRefreshToken(foundUser);
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/auth/refresh',

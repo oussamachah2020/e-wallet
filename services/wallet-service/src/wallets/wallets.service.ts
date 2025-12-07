@@ -16,9 +16,12 @@ export class WalletsService {
     private walletRepository: Repository<Wallet>,
   ) {}
 
-  async createWallet(createWalletDto: CreateWalletDto): Promise<Wallet> {
+  async createWallet(
+    createWalletDto: CreateWalletDto,
+    userId: string,
+  ): Promise<Wallet> {
     const existingWallet = await this.walletRepository.findOne({
-      where: { userId: createWalletDto.userId },
+      where: { userId: userId },
     });
 
     if (existingWallet) {
@@ -26,7 +29,7 @@ export class WalletsService {
     }
 
     const wallet = this.walletRepository.create({
-      userId: createWalletDto.userId,
+      userId,
       currency: createWalletDto.currency || 'USD',
       balance: 0,
       status: WalletStatus.ACTIVE,

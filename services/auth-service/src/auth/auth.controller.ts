@@ -15,6 +15,7 @@ import { RefreshTokenDto } from './dto/refreshToken.dto';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -26,14 +27,20 @@ export class AuthController {
   }
 
   @Post('login')
-  @HttpCode(HttpStatus.OK) // ← Login should return 200, not 201
-  async login(@Body() loginDto: LoginDto, @Res() res) {
+  @HttpCode(HttpStatus.OK)
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     return this.authService.login(loginDto, res);
   }
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  async refresh(@Body() refreshTokenDto: RefreshTokenDto, @Res() res) {
+  async refresh(
+    @Body() refreshTokenDto: RefreshTokenDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     return this.authService.refreshAccessToken(refreshTokenDto.token, res);
   }
 

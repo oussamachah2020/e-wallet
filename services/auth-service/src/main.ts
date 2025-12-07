@@ -1,17 +1,21 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
+import { AppModule } from './app.module';
+
+// Use require for cookie-parser
+const cookieParser = require('cookie-parser');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   app.setGlobalPrefix('/api/v1');
+
+  // Now this will work
   app.use(cookieParser());
 
-  // Enable CORS with credentials
   app.enableCors({
-    origin: 'http://localhost:3100', // Your frontend URL
-    credentials: true, // ← CRITICAL: Allow cookies
+    origin: 'http://localhost:3100',
+    credentials: true,
   });
 
   app.useGlobalPipes(
@@ -22,6 +26,9 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(process.env.PORT ?? 3000);
+  const port = process.env.PORT || 3001;
+  await app.listen(port);
+  console.log(`Auth service is running on: http://localhost:${port}`);
 }
+
 bootstrap();
