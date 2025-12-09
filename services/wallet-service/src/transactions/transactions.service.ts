@@ -14,6 +14,7 @@ import { Wallet } from 'src/wallets/entities/wallet.entity';
 import * as crypto from 'crypto';
 import { FundWalletDto } from 'src/wallets/dto/fund-wallet.dto';
 import { TransferMoneyDto } from 'src/wallets/dto/transfer-money.dto';
+import { BeneficiariesService } from 'src/beneficiaries/beneficiaries.service';
 
 @Injectable()
 export class TransactionsService {
@@ -25,6 +26,8 @@ export class TransactionsService {
     private walletRepository: Repository<Wallet>,
 
     private dataSource: DataSource,
+
+    private beneficiariesService: BeneficiariesService,
   ) {}
 
   private generateReference(): string {
@@ -146,6 +149,13 @@ export class TransactionsService {
       transaction.status = TransactionStatus.COMPLETED;
       transaction.completedAt = new Date();
       await manager.save(transaction);
+
+      this.beneficiariesService
+        .updateLastTransactionDate(fromUserId, transferDto.toUserId)
+        .catch((error) => {
+          // Log error but don't fail transaction
+          console.error('Failed to update beneficiary:', error);
+        });
 
       return transaction;
     });

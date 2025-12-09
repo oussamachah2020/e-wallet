@@ -26,7 +26,9 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async register(data: RegisterDto): Promise<{ message: string }> {
+  async register(
+    data: RegisterDto,
+  ): Promise<{ success: boolean; message: string }> {
     if (!data) {
       throw new BadRequestException('Invalid registration data');
     }
@@ -45,17 +47,18 @@ export class AuthService {
       ...data,
       password: hashedPassword,
     });
+
     await this.userRepository.save(user);
 
     return {
+      success: true,
       message: 'Account created successfully !',
     };
   }
 
   async login(
     credentials: LoginDto,
-    res: Response,
-  ): Promise<{ accessToken: string }> {
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     if (!credentials) {
       throw new BadRequestException('Missing credentials');
     }
@@ -80,16 +83,9 @@ export class AuthService {
     const accessToken = await this.generateAccessToken(foundUser);
     const refreshToken = await this.generateRefreshToken(foundUser);
 
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/auth/refresh',
-    });
-
     return {
       accessToken,
+      refreshToken,
     };
   }
 
@@ -109,7 +105,7 @@ export class AuthService {
     return { message: 'Logged out successfully' };
   }
 
-  async refreshAccessToken(token: string, res: Response) {
+  async refreshAccessToken(token: string) {
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
     const storedToken = await this.tokenRepository.findOne({
@@ -139,16 +135,9 @@ export class AuthService {
 
     await this.tokenRepository.save(storedToken);
 
-    res.cookie('refreshToken', newToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/auth/refresh',
-    });
-
     return {
       accessToken,
+      newToken,
     };
   }
 

@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -25,6 +26,10 @@ export class Wallet {
 
   @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
   balance: number;
+
+  @Column({ name: 'account_number', unique: true, length: 10, nullable: true })
+  @Index()
+  accountNumber: string;
 
   @Column({ type: 'varchar', length: 3, default: 'USD' })
   currency: string;

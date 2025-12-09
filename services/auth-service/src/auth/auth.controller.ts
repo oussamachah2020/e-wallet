@@ -22,26 +22,21 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
+  @HttpCode(HttpStatus.OK)
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(
-    @Body() loginDto: LoginDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    return this.authService.login(loginDto, res);
+  async login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto);
   }
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  async refresh(
-    @Body() refreshTokenDto: RefreshTokenDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    return this.authService.refreshAccessToken(refreshTokenDto.token, res);
+  async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
+    return this.authService.refreshAccessToken(refreshTokenDto.token);
   }
 
   @Post('logout')
@@ -56,8 +51,7 @@ export class AuthController {
     return {
       id: user.id,
       email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      fullName: user.fullName,
       createdAt: user.created_at,
     };
   }

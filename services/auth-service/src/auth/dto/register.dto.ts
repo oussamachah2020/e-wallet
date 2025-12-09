@@ -8,4 +8,6 @@ export class RegisterDto {
   @MinLength(8)
   password: string;
 
+  @IsString()
+  fullName?: string;
 }
